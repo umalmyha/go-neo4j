@@ -4,3 +4,26 @@ services:
   srv:
     build:
       context: .
+    environment:
+      - NEO4J_URL=${NEO4J_URL}
+      - NEO4J_USERNAME=${NEO4J_USERNAME}
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD}
+    depends_on:
+      - neo4j
+    ports:
+      - "8080:${SERVER_PORT}"
+
+  neo4j:
+    image: "neo4j"
+    environment:
+      - NEO4J_AUTH=${NEO4J_USERNAME}/${NEO4J_PASSWORD}
+    ports:
+      - "7474:7474" # HTTP port
+      - "7687:7687" # Bolt port
+    volumes:
+      - neo4j-data:/data
+      - neo4j-logs:/logs
+
+volumes:
+  neo4j-data:
+  neo4j-logs:

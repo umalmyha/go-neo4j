@@ -2,11 +2,14 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 	"github.com/umalmyha/go-neo4j/internal/config"
+	"github.com/umalmyha/go-neo4j/internal/handler"
+	"github.com/umalmyha/go-neo4j/internal/storage"
 )
 
 func main() {
@@ -21,13 +24,15 @@ func main() {
 	}
 	defer drv.Close(context.Background())
 
-	app := fiber.New()
+	emailStorage := storage.NewNeo4jEmailStorage(drv)
+	emailHandler := handler.NewEmailHandler(emailStorage)
 
-	app.Post("/emails", func(ctx *fiber.Ctx) error {
+	e := echo.New()
+	e.POST("/users", emailHandler.CreateUser)
+	e.GET("/users/:id", emailHandler.FindByID)
+	e.POST("/emails", emailHandler.CreateEmail)
 
-	})
-
-	if err := app.Listen(":8080"); err != nil {
+	if err := e.Start(fmt.Sprintf(":%d", cfg.ServerPort)); err != nil {
 		log.Fatal(err)
 	}
 }

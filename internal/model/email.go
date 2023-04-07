@@ -1,8 +1,8 @@
 package model
 
 type Email struct {
-	From    string
-	To      []string
-	Cc      []string
-	Content string
+	From    string   `json:"from"`
+	To      string   `json:"to"`
+	Cc      []string `json:"cc"`
+	Content string   `json:"content"`
 }
